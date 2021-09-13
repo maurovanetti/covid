@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -9,19 +10,277 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
     <title>Hello, world!</title>
+
+    <style>
+      .display-variable {
+        font-weight: bold;
+      }
+
+      .progress {
+        height: 20px;
+      }
+
+      .progress.thin {
+        height: 5px;
+      }
+
+      .progress-bar.tested {
+        background-color: green;        
+      }
+
+      .progress-bar.infectious {
+        background-color: orangered;
+      }
+
+      .progress-bar.total {
+        background-color: red;
+      }
+      </style>
+
   </head>
   <body>
-    <h1>Hello, world!</h1>
+      
 
-    <!-- Optional JavaScript; choose one of the two! -->
+    <div class="container">
+    
+      <form class="border rounded p-3 mb-3 mt-3">
+        <h3>Parametri</h3>
+        <p>Regola i parametri.</p>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
+        <label for="eff_v" class="form-label">Efficacia del vaccino nel prevenire il contagio asintomatico: <span class="display-eff_v display-variable">?</span></label>
+        <input type="range" class="form-range" min="0" max="100" step="1" id="eff_v" value="60">
+
+        <label for="eff_t" class="form-label">Efficacia del tampone nell'individuare il contagio asintomatico: <span class="display-eff_t display-variable">?</span></label>
+        <input type="range" class="form-range" min="0" max="100" step="1" id="eff_t" value="60">
+
+        <label for="w" class="form-label">Durata della finestra di contagiosità asintomatica: <span class="display-w display-variable">?</span> ore</label>
+        <input type="range" class="form-range" min="12" max="120" step="1" id="w" value="48">
+
+        <label for="t_t" class="form-label">Intervallo tra un tampone e quello successivo: <span class="display-t_t display-variable">?</span> giorni (<span class="display-24t_t display-variable">?</span> ore)</label>
+        <input type="range" class="form-range" min="1" max="14" step="1" id="t_t" value="2">
+
+        
+        <input id="compute" class="btn btn-primary" value="Calcola">
+      </form>
+
+      <div id="estimation" style="display: none;">
+
+        <h3>Stime</h3>
+        <p>Questo è un calcolo semplificato e basato sui parametri stabiliti sopra (che potrebbero essere sbagliati!).</p>
+        <p>Ipotizziamo che in un posto di lavoro senza vaccini e tamponi ci siano in ogni momento <b>100</b> persone contagiate asintomatiche.</p>
+        <p>Stiamo ipotizzando che all'insorgere dei sintomi i contagiati vengano bloccati in qualsiasi caso. Ci interessa dunque solo la fase asintomatica contagiosa.
+          Alcune persone guariranno o diventeranno sintomatiche nel corso della giornata, ma siccome il numero è stabile saranno sostituite da un uguale numero
+          di persone che entrano nella finestra asintomatica. Mediamente ogni <span class="display-24turnover display-variable">?</span> ore una di queste cento persone esce dalla finestra e un'altra vi entra.</p>
+        Questo equivale a <span class="display-total_n display-variable">100</span> asintomatici contagiosi per tutto il giorno.
+        <div class="progress">   
+          <div id="total_n" class="progress-bar total" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>        
+
+        <div class="container border rounded p-3 m-3">
+          <p>Se tutti fossero vaccinati, avremmo ogni giorno…</p>
+          
+          …mediamente <span class="display-total_v display-variable">?</span> asintomatici contagiosi nonostante la vaccinazione.
+          <div class="progress">                    
+            <div id="total_v" class="progress-bar total" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+        </div>
+
+        <div class="container border rounded p-3 m-3">
+          <p>Se tutti fossero tamponati ogni <span class="display-t_t display-variable">?</span> giorni, avremmo ogni giorno…</p>
+
+          <span id="if-t0">
+            …l'equivalente di <span class="display-t0 display-variable">?</span> asintomatici contagiosi che non sono ancora stati tamponati dall'inizio della loro contagiosità.<br>
+            <div class="progress thin">
+              <div id="t0" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt0" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t1">        
+            <hr>
+            …l'equivalente di <span class="display-t1 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>un</b> solo tampone;
+            di questi, <span class="display-fnt1 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t1" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt1" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t2">
+            <hr>
+            …l'equivalente di <span class="display-t2 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>due</b> tamponi;
+            di questi, <span class="display-fnt2 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t2" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt2" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t3">
+            <hr>
+            …l'equivalente di <span class="display-t3 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>tre</b> tamponi;
+            di questi, <span class="display-fnt3 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t3" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt3" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t4">
+            <hr>
+            …l'equivalente di <span class="display-t4 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>quattro</b> tamponi;
+            di questi, <span class="display-fnt4 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t4" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt4" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t5">        
+            <hr>
+            …l'equivalente di <span class="display-t5 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>cinque</b> tamponi;
+            di questi, <span class="display-fnt5 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t5" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt5" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <span id="if-t6">          
+            <hr>
+            …l'equivalente di <span class="display-t6 display-variable">?</span> asintomatici contagiosi che hanno fatto <b>sei</b> tamponi;
+            di questi, <span class="display-fnt6 display-variable">?</span> otterrebbero dei falsi negativi.
+            <div class="progress thin">
+              <div id="t6" class="progress-bar tested" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="progress">
+              <div id="fnt6" class="progress-bar infectious" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </span>
+          <hr>       
+          …e dunque, in totale, l'equivalente di <span class="display-total_t display-variable">?</span> asintomatici contagiosi per tutto il giorno, nonostante i tamponi.
+          <div class="progress">
+            <div id="total_t" class="progress-bar total" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+        </div>
+
+      </div>
+      
+    
+    </div>
+  
+    <!-- JavaScript: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
-    -->
+    <script>
+      var listened = [];
+
+      function r(x) {
+        if (Number.isInteger(x)) {
+          return x;
+        }
+        return Number.parseFloat(x).toPrecision(2);
+      }
+
+      function updateBar(id, x) {
+        var progressBar = document.querySelector('#' + id);
+        progressBar.style.width = x + '%';
+        updateHtml('.display-' + id, r(x));
+        return x;
+      }
+      
+      function updateHtml(selector, html) {
+        var elements = document.querySelectorAll(selector);
+        elements.forEach((element) => element.innerHTML = html);
+      }
+
+      function listenForChange(id, converter = (x) => x) {
+        var element = document.getElementById(id);
+        element.addEventListener('change', function () {
+          updateHtml('.display-' + id, element.value);
+          updateHtml('.display-24' + id, converter(element.value * 24));
+        });
+        listened.push(id);
+      }
+
+      function showArea(id, condition) {
+        var area = document.getElementById(id);
+        area.style.margin = '100px';
+        area.style.display = condition ? '' : 'none';
+      } 
+
+      listenForChange('eff_v', (x) => (x + '%'));
+      listenForChange('eff_t', (x) => (x + '%'));
+      listenForChange('w');
+      listenForChange('t_t');
+
+      var compute = document.querySelector('#compute');
+      const change = new Event('change');
+      compute.addEventListener('click', function () {      
+        listened.forEach(function (id) {
+          document.getElementById(id).dispatchEvent(change);
+        });
+
+        var w = document.getElementById('w').value;
+        var tW = w / 24;
+
+        updateBar('total_n', 100);
+
+        var turnover = tW / 100;
+        updateHtml('.display-24turnover', r(turnover * 24));
+
+        var effV = document.getElementById('eff_v').value;
+        updateBar('total_v', 100 - effV);
+      
+        var effT = document.getElementById('eff_t').value;
+        var tT = document.getElementById('t_t').value;
+
+        var t = [];
+        if (tW < tT) {
+          t[1] = tW  / (2 * tT);
+          t[0] = 1 - t[1];
+        } else {
+          t[0] = tT / (2 * tW);
+          var deltaT = tT / tW;
+          var sumT = t[0];
+          for (var sumT = t[0]; sumT + deltaT < 1; sumT += deltaT) {
+            t.push(deltaT);
+          }
+          t.push(1 - sumT);
+        }
+
+        var fnT = [];
+        var kT = (100 - effT) / 100;
+        var kTn = 1;
+        for (var n = 0; n < t.length; n++) {
+          fnT[n] = t[n] * kTn;
+          kTn *= kT;
+        }        
+
+        var totalT = 0;
+        for (var i = 0; i <= 6; i++) {
+          if (i < t.length) {            
+            updateBar('t'+ i, r(100 * t[i]));
+            totalT += updateBar('fnt'+ i, 100 * fnT[i]);
+            showArea('if-t' + i, true);
+          } else {
+            showArea('if-t' + i, false);
+          }
+        }
+
+        updateBar('total_t', totalT);        
+
+        document.getElementById('estimation').style.display = '';
+      });
+    </script>
+
   </body>
 </html>
