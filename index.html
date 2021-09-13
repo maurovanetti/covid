@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="it">
   <head>
@@ -70,9 +69,10 @@
         <div class="col" id="estimation" style="visibility: hidden;">
           
           <p>Ipotizziamo che in un posto di lavoro senza vaccini e tamponi ci siano in ogni momento <b>100</b> persone contagiate asintomatiche.</p>
-          <p>Stiamo ipotizzando che all'insorgere dei sintomi i contagiati vengano bloccati in qualsiasi caso. Ci interessa dunque solo la fase asintomatica contagiosa.
+          <p>Si suppone che all'insorgere dei sintomi i contagiati vengano bloccati in qualsiasi caso. Ci interessa dunque solo la fase asintomatica contagiosa.
             Alcune persone guariranno o diventeranno sintomatiche nel corso della giornata, ma siccome il numero è stabile saranno sostituite da un uguale numero
-            di persone che entrano nella finestra asintomatica. Mediamente ogni <span class="display-24turnover display-variable">?</span> ore una di queste cento persone esce dalla finestra e un'altra vi entra.</p>
+            di persone che entrano nella finestra asintomatica. Mediamente ogni <span class="display-turnover display-variable">?</span> minuti 
+            una di queste cento persone esce dalla finestra e un'altra vi entra.</p>
           Questo equivale a <span class="display-total_n display-variable">100</span> asintomatici contagiosi per tutto il giorno.
           <div class="progress">   
             <div id="total_n" class="progress-bar total" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -248,8 +248,8 @@
 
         updateBar('total_n', 100);
 
-        var turnover = tW / 100;
-        updateHtml('.display-24turnover', r(turnover * 24));
+        var turnover = w * 60 / 100;
+        updateHtml('.display-turnover', r(turnover));
 
         var effV = document.getElementById('eff_v').value;
         updateBar('total_v', 100 - effV);
