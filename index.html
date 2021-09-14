@@ -34,6 +34,11 @@
       .progress-bar.total {
         background-color: red;
       }
+
+      .disclaimer {
+        color: darkgray;
+        font-size: small;
+      }
       </style>
 
   </head>
@@ -60,10 +65,33 @@
             <input type="range" class="form-range" min="1" max="14" step="1" id="t_t" value="2">
 
             
-            <input id="compute" class="btn btn-primary" type="button" value="Calcola">
-
-            <p><i>Attenzione</i>: questo è un calcolo semplificato e basato sui parametri stabiliti sopra (che potrebbero essere sbagliati!).</p>
+            <input id="compute" class="btn btn-primary" type="button" value="Calcola">            
           </form>
+
+          <div class="disclaimer">
+            <p>
+              <i>Attenzione</i>: questo è un calcolo semplificato e basato sui parametri stabiliti sopra (che potrebbero essere sbagliati!).
+              Serve a capire come funziona il meccanismo dei tamponi rapidi dal punto di vista della sicurezza per gli altri e non serve a prendere decisioni sanitarie.
+              L'autore di questa pagina consiglia a chiunque possa farlo di vaccinarsi e crede nell'importanza di una vaccinazione di massa su scala mondiale.
+            </p>
+            <p>
+              Questo modello rudimentale si basa su una serie di semplificazioni e presupposti convenzionali. Se ne elencano alcuni:
+            <ul>
+              <li>La finestra di contagiosità asintomatica ha la stessa durata per vaccinati e non, come sembra che sia nella realtà.</li>
+              <li>La finestra di contagiosità asintomatica ha una durata fissa per tutti.</li>                          
+              <li>Ogni tampone funziona come un evento stocastico indipendente, che sui contagiati ha sempre la stessa probabilità di dare un falso negativo.</li>
+              <li>La positività al tampone (rapido) corrisponde con la contagiosità, che è molto simile a quanto avviene nella realtà.</li>
+            </ul>
+            </p>
+            <p>
+              Il modello non prende in considerazione i diversi effetti dell'ingresso di un contagiato asintomatico vaccinato oppure non vaccinato 
+              nel posto di lavoro. Al momento della creazione della pagina non si sa ancora molto su queste differenze.
+            </p>
+            <p>
+              Il modello ovviamente non considera la probabilità di ricovero o morte, che è dove si trova il vantaggio maggiore dei vaccini.
+            </p>
+          </div>
+
         </div>
 
         <div class="col" id="estimation" style="visibility: hidden;">
@@ -216,7 +244,7 @@
       function listenForChange(id, converter = (x) => x) {
         var element = document.getElementById(id);
         element.addEventListener('change', function () {
-          updateHtml('.display-' + id, element.value);
+          updateHtml('.display-' + id, converter(element.value));
           updateHtml('.display-24' + id, converter(element.value * 24));
           if (compute.clicked) {
             compute.dispatchEvent(click);
